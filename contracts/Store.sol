@@ -3,15 +3,20 @@ pragma solidity ^0.4.17;
 import "./Escrow.sol";
 
 contract Store {
-    enum ProductStatus { Available, Processing, Shipping, Sold }
+    enum ProductStatus {
+        Available,
+        Processing,
+        Shipping,
+        Sold
+    }
 
     struct Product {
         string name;
         string category;
         string imageLink;
         string descLink;
-        uint price;
-        uint index;
+        uint256 price;
+        uint256 index;
         ProductStatus status;
     }
 
@@ -29,23 +34,23 @@ contract Store {
 
     event ProductCreated(
         bytes32 indexed id,
-        uint index,
+        uint256 index,
         string name,
         string category,
         string imageLink,
         string descLink,
-        uint price,
+        uint256 price,
         ProductStatus status
     );
 
     event ProductUpdated(
         bytes32 indexed id,
-        uint index,
+        uint256 index,
         string name,
         string category,
         string imageLink,
         string descLink,
-        uint price,
+        uint256 price,
         ProductStatus status
     );
 
@@ -56,7 +61,7 @@ contract Store {
         address escrow
     );
 
-    modifier onlyOwner {
+    modifier onlyOwner() {
         require(msg.sender == owner);
         _;
     }
@@ -70,10 +75,8 @@ contract Store {
         string category,
         string imageLink,
         string descLink,
-        uint price
-    )
-        public onlyOwner returns (uint)
-    {
+        uint256 price
+    ) public onlyOwner returns (uint256) {
         bytes32 id = keccak256(name, category, imageLink, descLink, price);
         require(!isProduct(id));
 
@@ -105,7 +108,9 @@ contract Store {
         require(products[id].status == ProductStatus.Available);
         address seller = owner; // Only allow owner sell items for now
         address buyer = msg.sender;
-        address escrow = address((new Escrow).value(msg.value)(buyer, seller, id));
+        address escrow = address(
+            (new Escrow).value(msg.value)(buyer, seller, id)
+        );
 
         orders[id].productId = id;
         orders[id].seller = seller;
@@ -133,8 +138,8 @@ contract Store {
             string,
             string,
             string,
-            uint,
-            uint,
+            uint256,
+            uint256,
             ProductStatus
         )
     {
@@ -151,16 +156,17 @@ contract Store {
         );
     }
 
-    function getProductCount() public view returns (uint) {
+    function getProductCount() public view returns (uint256) {
         return productIds.length;
     }
 
-    function getProductIdAt(uint index) public view returns (bytes32) {
+    function getProductIdAt(uint256 index) public view returns (bytes32) {
         return productIds[index];
     }
 
     function updateProductStatus(bytes32 id, ProductStatus status)
-        public returns (bool)
+        public
+        returns (bool)
     {
         require(isProduct(id));
 

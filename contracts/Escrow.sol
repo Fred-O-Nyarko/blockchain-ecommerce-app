@@ -7,16 +7,20 @@ contract Escrow {
     address buyer;
     address seller;
     bytes32 productId;
-    uint createdAt = now;
-    uint public buyerOk;
-    uint public sellerOk;
+    uint256 createdAt = now;
+    uint256 public buyerOk;
+    uint256 public sellerOk;
 
-    modifier onlyParticipant {
+    modifier onlyParticipant() {
         require(msg.sender == buyer || msg.sender == seller);
         _;
     }
 
-    function Escrow(address _buyer, address _seller, bytes32 _productId) public payable {
+    function Escrow(
+        address _buyer,
+        address _seller,
+        bytes32 _productId
+    ) public payable {
         require(msg.value > 0);
         owner = msg.sender;
         buyer = _buyer;
